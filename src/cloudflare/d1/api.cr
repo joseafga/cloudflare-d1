@@ -51,28 +51,45 @@ module Cloudflare::D1
     end
 
     # Returns a list of D1 databases.
-    def list
+    #
+    # *query* parameters:
+    #
+    # A database name to search for. *(Optional)*
+    # *name*: String
+    #
+    # Page number of paginated results. *(Optional)*
+    # *page*: Number
+    # (minimum: 1, default: 1)
+    #
+    # Number of items per page. *(Optional)*
+    # *per_page*: Number
+    # (maximum: 10000, minimum: 10, default: 1000)
+    def list(query = nil)
       @headers["Content-Type"] = "application/json"
-      response = request
+      response = request(query: query)
 
-      Response(Array(Database)).from_json response
+      Response(Array(Response::Database)).from_json response
     rescue ex : JSON::SerializableError
-      raise Cloudflare::D1::BadResponseException.new "Can't parse JSON response", response
+      raise Cloudflare::D1::BadResponseException.new "Can't parse JSON response"
     end
 
     # Returns the specified D1 database.
     def get(uuid)
       @headers["Content-Type"] = "application/json"
-      response = request "GET", "/#{uuid}"
+      response = request(path: "/#{uuid}")
 
-      Response(Database).from_json response
+      Response(Response::Database).from_json response
     rescue ex : JSON::SerializableError
-      raise Cloudflare::D1::BadResponseException.new "Can't parse JSON response", response
+      raise Cloudflare::D1::BadResponseException.new "Can't parse JSON response"
     end
 
-    private def request(method = "GET", path : String? = nil)
-      Log.debug { "Requesting -> #{method}, #{path}" }
-      response = HTTP::Client.exec method, "#{@endpoint}#{path}", headers: @headers
+    private def request(method = "GET", path : String? = nil, query = nil)
+      Log.debug { "Requesting -> #{method}, path: #{path}, query: #{query}" }
+
+      url = URI.parse("#{@endpoint}#{path}")
+      url.query = URI::Params.encode(query) unless query.nil?
+
+      response = HTTP::Client.exec method, url, headers: @headers
       content_type = MIME::MediaType.parse(response.headers["Content-Type"])
 
       case content_type.media_type

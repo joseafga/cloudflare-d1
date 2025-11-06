@@ -5,6 +5,7 @@ describe Cloudflare::D1 do
   it "List D1 Databases" do
     db = Cloudflare::D1::DB.new
     db.list
+    db.list({name: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"})
   end
 
   it "Get D1 Database" do
