@@ -4,7 +4,7 @@ module Cloudflare::D1
 
     getter errors = [] of ResponseInfo
     getter messages = [] of ResponseInfo
-    property result : T
+    property! result : T
     # Whether the API call was successful
     getter? success : Bool
     # *(Optional)*
