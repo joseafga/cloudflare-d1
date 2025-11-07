@@ -116,6 +116,19 @@ module Cloudflare::D1
       Response(Nil).from_json request(method: "DELETE", url: url)
     end
 
+    # Returns the query result as an object.
+    #
+    # *sql* Your SQL query.
+    # Supports multiple statements, joined by semicolons, which will be executed as a batch.
+    #
+    # *args* SQL arguments. *(Optional)*
+    # Documentation say `Array<string>` but work with other basic types
+    def query(uuid : String, sql : String, args : Array(Any)? = nil)
+      url = URI.parse("#{@endpoint}/#{uuid}/query")
+
+      Response(JSON::Any).from_json request(method: "POST", url: url, body: { sql: sql, params: args }.to_json)
+    end
+
     private def request(**params)
       Log.debug { "Requesting -> #{params}" }
       args = {method: "GET", url: @endpoint, headers: @headers}.merge(params)

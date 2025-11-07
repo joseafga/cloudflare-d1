@@ -35,10 +35,14 @@ describe Cloudflare::D1 do
     db.delete "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
   end
 
-  # it "Query D1 Database" do
-  #   db = Cloudflare::D1::DB.new
-  #   db.exec "SELECT * FROM Customers WHERE CompanyName = ?", args: "Bs Beverages"
-  # end
+  it "Query D1 Database" do
+    db = Cloudflare::D1::DB.new
+    db.query "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", "CREATE TABLE Users (id INTEGER PRIMARY KEY, name TEXT NOT NULL, age INTEGER);"
+    db.query "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", "INSERT INTO Users (name, age) VALUES ('John', 25)"
+    result = db.query "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", "SELECT * FROM Users WHERE name = ?", args: ["John"]
+    # db.query "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", "SELECT * FROM Users WHERE age = ?", args: [25]
+    result.result[0]["results"][0]["age"].as_i.should eq 25
+  end
 
   # it "Raw D1 Database Query" do
   # end

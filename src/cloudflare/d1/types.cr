@@ -47,4 +47,6 @@ module Cloudflare::D1
     APAC
     OC
   end
+
+  alias Any = String | Int32 | Int64 | Float64 | Bool
 end

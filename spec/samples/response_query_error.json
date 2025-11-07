@@ -1,0 +1,9 @@
+{
+  "success": false,
+  "errors": [
+    {
+      "code": 7400,
+      "message": "Invalid property: params => Expected array, received string | Invalid property: batch => Required"
+    }
+  ]
+}

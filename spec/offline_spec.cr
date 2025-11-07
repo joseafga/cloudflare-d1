@@ -13,4 +13,8 @@ describe Cloudflare::D1 do
   it "Get D1 Database with error" do
     Cloudflare::D1::Response(Cloudflare::D1::Database).from_json Samples.load_json("response_get_error")
   end
+
+  it "Query D1 Database with error on params" do
+    Cloudflare::D1::Response(JSON::Any).from_json Samples.load_json("response_query_error")
+  end
 end
