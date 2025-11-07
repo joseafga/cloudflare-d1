@@ -99,6 +99,26 @@ module Cloudflare::D1
       raise Cloudflare::D1::BadResponseException.new "Can't parse JSON response"
     end
 
+    # Updates the specified D1 database.
+    def update(uuid : String, read_replication : ReadReplication)
+      url = URI.parse("#{@endpoint}/#{uuid}")
+
+      Response(Database).from_json request(method: "PUT", url: url, body: { read_replication: read_replication }.to_json)
+    rescue ex : JSON::SerializableError
+      raise Cloudflare::D1::BadResponseException.new "Can't parse JSON response"
+    end
+
+    # Updates partially the specified D1 database.
+    def update_partial(uuid : String, read_replication : ReadReplication? = nil)
+      url = URI.parse("#{@endpoint}/#{uuid}")
+      body = {} of String => String
+      body["read_replication"] = read_replication.to_json unless read_replication.nil?
+
+      Response(Database).from_json request(method: "PATCH", url: url, body: body.to_json)
+    rescue ex : JSON::SerializableError
+      raise Cloudflare::D1::BadResponseException.new "Can't parse JSON response"
+    end
+
     private def request(**params)
       Log.debug { "Requesting -> #{params}" }
       args = {method: "GET", url: @endpoint, headers: @headers}.merge(params)

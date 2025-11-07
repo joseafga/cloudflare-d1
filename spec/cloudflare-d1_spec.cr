@@ -20,15 +20,15 @@ describe Cloudflare::D1 do
     db.create "mydb", :enam
   end
 
-  # it "Update D1 Database" do
-  #   db = Cloudflare::D1::DB.new
-  #   db.update "database_id"
-  # end
+  it "Update D1 Database" do
+    db = Cloudflare::D1::DB.new
+    db.update "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", Cloudflare::D1::ReadReplication.new(:auto)
+  end
 
-  # it "Update D1 Database Partially" do
-  #   db = Cloudflare::D1::DB.new
-  #   db.update_partial "database_id"
-  # end
+  it "Update D1 Database Partially" do
+    db = Cloudflare::D1::DB.new
+    db.update_partial "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  end
 
   # it "Delete D1 Database" do
   #   db = Cloudflare::D1::DB.new
