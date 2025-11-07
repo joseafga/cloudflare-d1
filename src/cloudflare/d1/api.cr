@@ -103,8 +103,8 @@ module Cloudflare::D1
     # Updates partially the specified D1 database.
     def update_partial(uuid : String, read_replication : ReadReplication? = nil)
       url = URI.parse("#{@endpoint}/#{uuid}")
-      body = {} of String => String
-      body["read_replication"] = read_replication.to_json unless read_replication.nil?
+      body = {} of String => ReadReplication
+      body["read_replication"] = read_replication unless read_replication.nil?
 
       Response(Database).from_json request(method: "PATCH", url: url, body: body.to_json)
     end
