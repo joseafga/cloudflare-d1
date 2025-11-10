@@ -4,8 +4,6 @@ require "./types"
 require "./response"
 
 module Cloudflare::D1
-  ENDPOINT = "https://api.cloudflare.com/client/v4"
-
   # d1.database
   #
   # curl https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/d1/database \
@@ -42,15 +40,13 @@ module Cloudflare::D1
 
   # Number of items per page.
   class DB
-    @endpoint : String
     @headers : HTTP::Headers
 
     # Configuration parameters are optional and non-initialized, so they must be defined later
     def initialize
-      @endpoint = "#{ENDPOINT}/accounts/#{Cloudflare::D1.config.account_id}/d1/database"
       @headers = HTTP::Headers{
         "Content-Type" => "application/json",
-        "Authorization" => "Bearer #{Cloudflare::D1.config.api_token}"
+        "Authorization" => "Bearer #{D1.config.api_token}"
       }
     end
 
@@ -75,7 +71,7 @@ module Cloudflare::D1
         q.add "per_page", per_page.to_s unless per_page.nil?
       end
 
-      url = URI.parse(@endpoint)
+      url = URI.parse(D1.config.endpoint)
       url.query = query unless query.empty?
 
       Response(Array(Database)).from_json request(url: url)
@@ -83,7 +79,7 @@ module Cloudflare::D1
 
     # Returns the specified D1 database.
     def get(uuid : String)
-      url = URI.parse("#{@endpoint}/#{uuid}")
+      url = URI.parse("#{D1.config.endpoint}/#{uuid}")
 
       Response(Database).from_json request(url: url)
     end
@@ -95,14 +91,14 @@ module Cloudflare::D1
 
     # Updates the specified D1 database.
     def update(uuid : String, read_replication : ReadReplication)
-      url = URI.parse("#{@endpoint}/#{uuid}")
+      url = URI.parse("#{D1.config.endpoint}/#{uuid}")
 
       Response(Database).from_json request(method: "PUT", url: url, body: { read_replication: read_replication }.to_json)
     end
 
     # Updates partially the specified D1 database.
     def update_partial(uuid : String, read_replication : ReadReplication? = nil)
-      url = URI.parse("#{@endpoint}/#{uuid}")
+      url = URI.parse("#{D1.config.endpoint}/#{uuid}")
       body = {} of String => ReadReplication
       body["read_replication"] = read_replication unless read_replication.nil?
 
@@ -111,7 +107,7 @@ module Cloudflare::D1
 
     # Deletes the specified D1 database.
     def delete(uuid : String)
-      url = URI.parse("#{@endpoint}/#{uuid}")
+      url = URI.parse("#{D1.config.endpoint}/#{uuid}")
 
       Response(Nil).from_json request(method: "DELETE", url: url)
     end
@@ -124,14 +120,14 @@ module Cloudflare::D1
     # *args* SQL arguments. *(Optional)*
     # Documentation say `Array<string>` but work with other basic types
     def query(uuid : String, sql : String, args : Array(Any)? = nil)
-      url = URI.parse("#{@endpoint}/#{uuid}/query")
+      url = URI.parse("#{D1.config.endpoint}/#{uuid}/query")
 
       Response(JSON::Any).from_json request(method: "POST", url: url, body: { sql: sql, params: args }.to_json)
     end
 
     private def request(**params)
       Log.debug { "Requesting -> #{params}" }
-      args = {method: "GET", url: @endpoint, headers: @headers}.merge(params)
+      args = {method: "GET", url: D1.config.endpoint, headers: @headers}.merge(params)
 
       response = HTTP::Client.exec(**args)
       content_type = MIME::MediaType.parse(response.headers["Content-Type"])
