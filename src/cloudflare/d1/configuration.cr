@@ -1,4 +1,6 @@
 module Cloudflare::D1
+  ENDPOINT = "https://api.cloudflare.com/client/v4"
+
   class_getter config = Configuration.new
 
   # Customize settings using a block.
@@ -14,7 +16,13 @@ module Cloudflare::D1
   end
 
   class Configuration
-    property account_id : String = ""
+    getter account_id : String = ""
     property api_token : String = ""
+    getter! endpoint : String
+
+    def account_id=(account_id)
+      @account_id = account_id
+      @endpoint = "#{ENDPOINT}/accounts/#{account_id}/d1/database"
+    end
   end
 end
