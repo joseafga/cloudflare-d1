@@ -11,10 +11,22 @@ describe D1 do
   end
 
   it "Get D1 Database with error" do
-    D1::Response(D1::Database).from_json Samples.load_json("response_get_error")
+    response = D1::Response(D1::Database).from_json Samples.load_json("response_get_error")
+
+    ex = expect_raises(D1::ResponseError) do
+      response.to_result
+    end
+
+    ex.info.first.code.should eq 7404
   end
 
   it "Query D1 Database with error on params" do
-    D1::Response(JSON::Any).from_json Samples.load_json("response_query_error")
+    response = D1::Response(JSON::Any).from_json Samples.load_json("response_query_error")
+
+    ex = expect_raises(D1::ResponseError) do
+      response.to_result
+    end
+
+    ex.info.first.code.should eq 7400
   end
 end
