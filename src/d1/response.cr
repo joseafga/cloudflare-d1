@@ -10,6 +10,13 @@ module D1
     # *(Optional)*
     getter result_info : ResultInfo?
 
+    # Get result
+    def to_result
+      return result if success?
+
+      raise ResponseError.new errors
+    end
+
     # Shared
     struct ResponseInfo
       include JSON::Serializable

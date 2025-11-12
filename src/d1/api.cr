@@ -14,7 +14,7 @@ module D1
     #
     # Number of items *per_page*.
     # (maximum: 10000, minimum: 10, default: 1000)
-    def list(name : String? = nil, page : Int32? = nil, per_page : Int32? = nil)
+    def list(name : String? = nil, page : Int32? = nil, per_page : Int32? = nil) : Array(Database)
       query = URI::Params.build do |q|
         q.add "name", name unless name.nil?
         q.add "page", page.to_s unless page.nil?
@@ -24,42 +24,48 @@ module D1
       url = URI.parse(D1.config.endpoint)
       url.query = query unless query.empty?
 
-      Response(Array(Database)).from_json request(url: url)
+      response = request(url: url)
+      Response(Array(Database)).from_json(response).to_result
     end
 
     # Returns the specified D1 database.
-    def get(uuid : String)
+    def get(uuid : String) : Database
       url = URI.parse("#{D1.config.endpoint}/#{uuid}")
 
-      Response(Database).from_json request(url: url)
+      response = request(url: url)
+      Response(Database).from_json(response).to_result
     end
 
     # Returns the specified D1 database.
-    def create(name : String, region : Location?)
-      Response(Database).from_json request(method: "POST", body: { name: name, primary_location_hint: region }.to_json)
+    def create(name : String, region : Location?) : Database
+      response = request(method: "POST", body: { name: name, primary_location_hint: region }.to_json)
+      Response(Database).from_json(response).to_result
     end
 
     # Updates the specified D1 database.
-    def update(uuid : String, read_replication : ReadReplication)
+    def update(uuid : String, read_replication : ReadReplication) : Database
       url = URI.parse("#{D1.config.endpoint}/#{uuid}")
 
-      Response(Database).from_json request(method: "PUT", url: url, body: { read_replication: read_replication }.to_json)
+      response = request(method: "PUT", url: url, body: { read_replication: read_replication }.to_json)
+      Response(Database).from_json(response).to_result
     end
 
     # Updates partially the specified D1 database.
-    def update_partial(uuid : String, read_replication : ReadReplication? = nil)
+    def update_partial(uuid : String, read_replication : ReadReplication? = nil) : Database
       url = URI.parse("#{D1.config.endpoint}/#{uuid}")
       body = {} of String => ReadReplication
       body["read_replication"] = read_replication unless read_replication.nil?
 
-      Response(Database).from_json request(method: "PATCH", url: url, body: body.to_json)
+      response = request(method: "PATCH", url: url, body: body.to_json)
+      Response(Database).from_json(response).to_result
     end
 
     # Deletes the specified D1 database.
-    def delete(uuid : String)
+    def delete(uuid : String) : Nil
       url = URI.parse("#{D1.config.endpoint}/#{uuid}")
 
-      Response(Nil).from_json request(method: "DELETE", url: url)
+      response = request(method: "DELETE", url: url)
+      Response(Nil).from_json(response).to_result
     end
 
     # Returns the query result as an object.
@@ -72,7 +78,12 @@ module D1
     def query(uuid : String, sql : String, args : Array(Any)? = nil)
       url = URI.parse("#{D1.config.endpoint}/#{uuid}/query")
 
-      Response(JSON::Any).from_json request(method: "POST", url: url, body: { sql: sql, params: args }.to_json)
+      response = request(method: "POST", url: url, body: { sql: sql, params: args }.to_json)
+      result = Response(JSON::Any).from_json(response).to_result
+
+      return result[0]["results"].as_a if result[0]["success"].as_bool
+
+      raise "The result failed."
     end
 
     private def request(**params)
