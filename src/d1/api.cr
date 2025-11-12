@@ -86,6 +86,19 @@ module D1
       raise "The result failed."
     end
 
+    # Returns the query result rows as arrays rather than objects. This is a performance
+    # optimized version of the /query endpoint.
+    def raw(uuid : String, sql : String, args : Array(Any)? = nil)
+      url = URI.parse("#{D1.config.endpoint}/#{uuid}/raw")
+
+      response = request(method: "POST", url: url, body: { sql: sql, params: args }.to_json)
+      result = Response(JSON::Any).from_json(response).to_result
+
+      return result[0]["results"].as_a if result[0]["success"].as_bool
+
+      raise "The result failed."
+    end
+
     private def request(**params)
       args = { # default params
         method: "GET",

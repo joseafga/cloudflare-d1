@@ -40,8 +40,9 @@ describe D1 do
     # result.result[0]["results"][0]["age"].as_i.should eq 25
   end
 
-  # it "Raw D1 Database Query" do
-  # end
+  it "Raw D1 Database Query" do
+    pp D1::Api.raw "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx", "SELECT * FROM Users WHERE name = ?", args: ["Billy"]
+  end
 
   it "Query D1 Database like crystal-db" do
     name = ""

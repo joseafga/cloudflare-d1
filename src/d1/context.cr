@@ -24,7 +24,7 @@ module D1
         args.push value
       end
 
-      Api.query(uuid, query, args)
+      Api.raw(uuid, query, args)
       Nil
     end
 
@@ -34,6 +34,14 @@ module D1
       end
 
       Api.query(uuid, query, args)
+    end
+
+    def raw(query, *values, args = [] of Any)
+      values.each do |value|
+        args.push value
+      end
+
+      Api.raw(uuid, query, args)
     end
 
     def db : Database
