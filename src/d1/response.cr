@@ -1,4 +1,4 @@
-module Cloudflare::D1
+module D1
   struct Response(T)
     include JSON::Serializable
 
@@ -9,6 +9,13 @@ module Cloudflare::D1
     getter? success : Bool
     # *(Optional)*
     getter result_info : ResultInfo?
+
+    # Get result
+    def to_result
+      return result if success?
+
+      raise ResponseError.new errors
+    end
 
     # Shared
     struct ResponseInfo
