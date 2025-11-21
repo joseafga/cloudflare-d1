@@ -7,7 +7,7 @@ module D1
   #
   # ```
   # D1.configure do |config|
-  #   cibfug.account_id = "023e105f4ecef8ad9ca31a8372d0c353"
+  #   config.account_id = "023e105f4ecef8ad9ca31a8372d0c353"
   #   config.api_token = "Sn3lZJTBX6kkg7OdcBUAxOO963GEIyGQqnFTOFYY"
   # end
   # ```

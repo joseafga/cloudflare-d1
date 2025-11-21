@@ -2,6 +2,8 @@ require "http/client"
 require "mime/media_type"
 
 module D1
+  # This module provides most basic interface to the D1 API.
+  # Is preferred to use `D1::Database` when possible.
   module Api
     extend self
 

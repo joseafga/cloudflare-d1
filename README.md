@@ -20,11 +20,26 @@
 require "d1"
 ```
 
-TODO: Write usage instructions here
+#### Configure credentials
 
-## Development
+```crystal
+D1.configure do |config|
+  config.account_id = "023e105f4ecef8ad9ca31a8372d0c353"
+  config.api_token = "Sn3lZJTBX6kkg7OdcBUAxOO963GEIyGQqnFTOFYY"
+end
+```
 
-TODO: Write development instructions here
+#### Run SQL
+
+```crystal
+D1.open("database-uuid") do |db|
+  db.exec "CREATE TABLE Users (id INTEGER PRIMARY KEY, name TEXT NOT NULL, age INTEGER);"
+  db.exec "INSERT INTO Users (name, age) VALUES ('Billy', 30)"
+  result = db.query "SELECT * FROM Users WHERE age = ?", 30
+
+  puts result.first["name"].as_s # => Billy
+end
+```
 
 ## Contributing
 

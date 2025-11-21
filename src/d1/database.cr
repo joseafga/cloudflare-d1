@@ -11,7 +11,7 @@ module D1
     yield db
   end
 
-  # The details of the D1 database.
+  # This is the primary way to interact with the D1 database.
   struct Database
     include JSON::Serializable
 
@@ -35,17 +35,17 @@ module D1
     def initialize(@uuid)
     end
 
-    # Shortcut to `D1::Api#update_database`
+    # The same as `D1::Api#update_database` with #uuid already
     def update(read_replication : ReadReplication)
       D1.update_database(uuid, read_replication)
     end
 
-    # Shortcut to `D1::Api#update_partial`
+    # The same as `D1::Api#update_partial` with #uuid already
     def update_partial(read_replication : ReadReplication? = nil)
       D1.update_database(uuid, read_replication)
     end
 
-    # Shortcut to `D1::Api#delete`
+    # The same as `D1::Api#delete` with #uuid already
     def delete
       D1.delete(uuid)
     end
